@@ -8,20 +8,21 @@ Created on Sat Jan 19 17:37:25 2019
 Lyrics retrieved from genius.com.
 '''
 
-from lxml import html
+import re
+import os
 import time
 import requests
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from string import punctuation
+from lxml import html
 from itertools import chain
 from collections import Counter
-import pandas as pd
-import matplotlib.pyplot as plt
 from PIL import Image
-import numpy as np
-from wordcloud import WordCloud, ImageColorGenerator
-from bs4 import BeautifulSoup
 from urllib.request import urlopen
-from string import punctuation
-import re
+from bs4 import BeautifulSoup
+from wordcloud import WordCloud, ImageColorGenerator
 
 
 def remove_values_from_list(the_list, vals):
@@ -96,6 +97,10 @@ def generate_wordcloud(file, artist, text_color, bg_image, recolor=False):
 
     '''
     start_time = time.time()
+    
+    save_dir = os.path.join('.', 'clouds')
+    if not os.path.isdir(save_dir): os.makedirs(save_dir)
+    
     data = pd.read_csv(file)
     data = data[data['Artist'].str.find(artist) != -1]
     data = data.drop_duplicates(subset='Song', keep='first')
@@ -104,12 +109,11 @@ def generate_wordcloud(file, artist, text_color, bg_image, recolor=False):
     base_url = 'https://genius.com/%s-' % artist.replace(' ', '-').lower()
     pages = [base_url + '-'.join(song.lower().split()) + '-lyrics' for song in songs]
     all_words = []
-    i = 0
     
-    for song, page in zip(songs, pages):
+    for i, (song, page) in enumerate(zip(songs, pages)):
         try:
             response = requests.get(page)
-            time.sleep(1)
+            time.sleep(0.5)
         except:
             print('Failed on %s.' % song)
             continue
@@ -126,7 +130,6 @@ def generate_wordcloud(file, artist, text_color, bg_image, recolor=False):
         words = list(set(chain.from_iterable([x.split() for x in words])))
         all_words.append(words)
         print('Done with song %d - %s' % (i+1, song))
-        i += 1
         
     print('Processed %d songs' % i)
     all_words = list(chain.from_iterable(all_words))
@@ -140,7 +143,7 @@ def generate_wordcloud(file, artist, text_color, bg_image, recolor=False):
     
     mask = np.array(Image.open(bg_image))
 
-    plt.figure()
+    fig, ax = plt.subplots()
     
     if recolor:
         image_colors = ImageColorGenerator(mask)
@@ -154,9 +157,9 @@ def generate_wordcloud(file, artist, text_color, bg_image, recolor=False):
                               mask=mask, mode='RGBA',
                               color_func=lambda *args, **kwargs: text_color).generate(one_str)
     
-    plt.imshow(wordcloud, interpolation='bilinear')
+    ax.imshow(wordcloud, interpolation='bilinear')
     plt.axis('off')
-    wordcloud.to_file('%s_wordcloud.png' % artist)
+    wordcloud.to_file(os.path.join(save_dir, '%s_wordcloud.png' % artist))
     
     end_time = time.time()
     elapsed = end_time - start_time
@@ -168,16 +171,16 @@ def generate_wordcloud(file, artist, text_color, bg_image, recolor=False):
 
 if __name__ == '__main__':
     artist = 'Relient K'
-    file = 'rk.csv'
+    file = './demo/rk.csv'
     text_color = (154, 205, 184) # mint green candy hearts ep
-    bg_img = '2017.jpg'
+    bg_img = './demo/rk-bw.jpg'
     
     most_used, one_str, request_times = generate_wordcloud(file, artist, text_color, bg_img)
     
     artist = 'Switchfoot'
-    file = 'sf_j4.csv'
+    file = './demo/sf_j4.csv'
     text_color = (251, 228, 76) # yellow native tongue
-    bg_img = 'nt.jpg'
+    bg_img = './demo/sf-bw.jpg'
     
     most_used, one_str, elapsed = generate_wordcloud(file, artist, text_color, bg_img)
     
