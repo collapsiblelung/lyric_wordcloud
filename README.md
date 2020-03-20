@@ -8,5 +8,5 @@ This project scrapes a song lyric website and gathers all words used in a partic
 ## Demo
 * git clone
 * Sample data is contained in demo.
-* Run lyric_wordcloud.py to see wordclouds for two Artists from the sample iTunes library data.
+* Run demo.py to see wordclouds for two Artists from the sample iTunes library data.
 * Two wordcloud images are generated in ./clouds.

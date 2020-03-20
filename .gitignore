@@ -2,4 +2,6 @@
 *.jpg
 *.jpeg
 .DS_Store
+__pycache__
 clouds
+backgrounds

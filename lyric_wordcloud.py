@@ -80,7 +80,7 @@ def generate_wordcloud(file, artist, text_color, bg_image, recolor=False):
     text_color : TUPLE
         RGB tuple color value.
     bg_image : STRING
-        Path to image used in the background of the word cloud.
+        Path to image later used in the background of the word cloud.
     recolor : BOOLEAN, default False
         If True, colors text in word cloud based on colors in bg_image.
         If False, uses text_color for all words.
@@ -168,19 +168,6 @@ def generate_wordcloud(file, artist, text_color, bg_image, recolor=False):
     return most_used, one_str, elapsed
 
 
-
 if __name__ == '__main__':
-    artist = 'Relient K'
-    file = './demo/rk.csv'
-    text_color = (154, 205, 184) # mint green candy hearts ep
-    bg_img = './demo/rk-bw.jpg'
-    
-    most_used, one_str, request_times = generate_wordcloud(file, artist, text_color, bg_img)
-    
-    artist = 'Switchfoot'
-    file = './demo/sf_j4.csv'
-    text_color = (251, 228, 76) # yellow native tongue
-    bg_img = './demo/sf-bw.jpg'
-    
-    most_used, one_str, elapsed = generate_wordcloud(file, artist, text_color, bg_img)
+    pass
     
